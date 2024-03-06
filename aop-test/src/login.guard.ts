@@ -1,0 +1,21 @@
+/*
+ * @Date: 2024-03-05 17:42:48
+ * @Description: description
+ */
+import { Inject, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { AppService } from './app.service';
+
+@Injectable()
+export class LoginGuard implements CanActivate {
+
+  @Inject(AppService)
+  private appService: AppService;
+
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    console.log('login check', this.appService.getHello());
+    return false;
+  }
+}
