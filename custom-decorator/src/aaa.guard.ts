@@ -19,6 +19,7 @@ export class AaaGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
+    console.log(this.reflector.get('ddd', context.getClass()));
     console.log(this.reflector.get('aaa', context.getHandler()));
     return true;
   }
