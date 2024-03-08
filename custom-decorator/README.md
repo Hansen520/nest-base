@@ -1,73 +1,8 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
-```bash
-$ pnpm install
-```
-
-## Running the app
-
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+```javascript
+装饰器分为以下五种：
+1.类装饰器：类装饰器用于装饰类，它接受一个 target 参数；target 参数表示被装饰的类的构造函数，在类装饰器中，可以通过修改这个参数来扩展或修改类本身。
+2.方法装饰器：方法装饰器用于装饰类的方法，它接受三个参数：target 、methodName 、descriptor；target 参数如果装饰的是静态方法，那么target就是类的构造函数；如果装饰的是实例方法，那么target就是类的原型对象；methodName 参数表示被装饰的方法的名称；descriptor参数表示被装饰的方法的属性描述符（PropertyDescriptor）。可以通过修改这个参数来扩展或修改方法的行为。
+3.访问器装饰器：访问器装饰器用于装饰类的访问器（getter和setter），它接受三个参数：target 、propertyName 、descriptor ；target参数如果装饰的是静态访问器，那么target就是类的构造函数；如果装饰的是实例访问器，那么target就是类的原型对象；propertyName参数表示被装饰的访问器的名称；descriptor参数表示被装饰的访问器的属性描述符（PropertyDescriptor）。可以通过修改这个参数来扩展或修改访问器的行为。
+4.属性装饰器：属性装饰器用于装饰类的属性，它接受两个参数：target 、propertyName ；target参数如果装饰的是静态属性，那么target就是类的构造函数；如果装饰的是实例属性，那么target就是类的原型对象 ；propertyName参数表示被装饰的属性的名称。
+5.参数装饰器：参数装饰器用于装饰函数或方法的参数，它接受三个参数：target 、methodName 、parameterIndex ；target参数如果装饰的是静态方法，那么target就是类的构造函数；如果装饰的是实例方法，那么target就是类的原型对象；methodName参数表示被装饰的方法的名称；parameterIndex参数表示被装饰的参数在方法参数列表中的索引。```

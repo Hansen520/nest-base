@@ -20,6 +20,10 @@ import { MyHeaders } from './myHeaders.decorators';
 import { MyQuery } from './myQuery.decorators';
 import { Ddd } from './ddd.decorator';
 
+function Type(type) {
+  return Reflect.metadata('type', type);
+}
+
 @Ddd('eee', 'han_Love')
 export class AppController {
   constructor(private readonly appService: AppService) {}
