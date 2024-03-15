@@ -12,7 +12,7 @@ export class MyFileValidator extends FileValidator {
 
   isValid(file): boolean {
     console.log(file, 13);
-    if (file.size > 10000) {
+    if (file.size > 300000) {
       return false;
     }
     return true;
