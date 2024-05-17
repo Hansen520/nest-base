@@ -1,7 +1,15 @@
+/*
+ * @Date: 2024-05-09 11:04:53
+ * @Description: description
+ */
+/*
+ * @Date: 2024-05-09 11:04:53
+ * @Description: description
+ */
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectEntityManager } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { User } from './entities/user.entity';
 
@@ -10,13 +18,16 @@ export class UserService {
   @InjectEntityManager()
   private manager: EntityManager;
 
+  // @InjectRepository(User)
+  // private userRepository: Repository<User>;
+
   create(createUserDto: CreateUserDto) {
     this.manager.save(User, createUserDto);
-    return 'This action adds a new user';
   }
 
   findAll() {
-    return `This action returns all user`;
+    // this.userRepository.find();
+    return this.manager.find(User);
   }
 
   findOne(id: number) {

@@ -1,27 +1,27 @@
 /*
- * @Date: 2024-05-09 10:51:00
+ * @Date: 2024-05-14 15:15:12
  * @Description: description
  */
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { User } from './user/entities/user.entity';
-import { UserModule } from './user/user.module';
+import { CityModule } from './city/city.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { City } from './city/entities/city.entity';
 
 @Module({
   imports: [
-    UserModule,
+    CityModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: '118.195.176.186',
       port: 28002,
       username: 'root',
       password: '325600',
-      database: 'typeorm_test',
+      database: 'tree_test',
       synchronize: true,
       logging: true,
-      entities: [User],
+      entities: [City],
       poolSize: 10,
       connectorPackage: 'mysql2',
       extra: {
