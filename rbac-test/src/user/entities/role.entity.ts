@@ -1,32 +1,27 @@
 /*
- * @Date: 2024-05-21 14:03:00
+ * @Date: 2024-06-06 10:20:20
  * @Description: description
  */
 import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Permission } from './permission.entity';
 
 @Entity()
-export class User {
+export class Role {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({
-    length: 50,
+    length: 20,
   })
-  username: string;
-
-  @Column({
-    length: 50,
-  })
-  password: string;
+  name: string;
 
   @CreateDateColumn()
   createTime: Date;
@@ -36,7 +31,7 @@ export class User {
 
   @ManyToMany(() => Permission)
   @JoinTable({
-    name: 'user_permission_relation', // 中间表名称
+    name: 'role_permission_relation',
   })
   permissions: Permission[];
 }

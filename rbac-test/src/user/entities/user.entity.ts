@@ -1,5 +1,5 @@
 /*
- * @Date: 2024-05-21 14:03:00
+ * @Date: 2024-06-06 10:13:54
  * @Description: description
  */
 import {
@@ -7,11 +7,11 @@ import {
   CreateDateColumn,
   Entity,
   JoinTable,
-  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  ManyToMany,
 } from 'typeorm';
-import { Permission } from './permission.entity';
+import { Role } from './role.entity';
 
 @Entity()
 export class User {
@@ -34,9 +34,9 @@ export class User {
   @UpdateDateColumn()
   updateTime: Date;
 
-  @ManyToMany(() => Permission)
+  @ManyToMany(() => Role)
   @JoinTable({
-    name: 'user_permission_relation', // 中间表名称
+    name: 'user_role_relation',
   })
-  permissions: Permission[];
+  roles: Role[];
 }
