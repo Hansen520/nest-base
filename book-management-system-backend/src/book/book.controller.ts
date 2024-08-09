@@ -13,6 +13,7 @@ import {
   Put,
   UploadedFile,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -26,8 +27,8 @@ export class BookController {
   constructor(private readonly bookService: BookService) {}
 
   @Get('list')
-  async list() {
-    return this.bookService.list();
+  async list(@Query('name') name: string) {
+    return this.bookService.list(name);
   }
 
   @Get(':id')
