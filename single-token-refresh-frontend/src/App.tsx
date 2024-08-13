@@ -106,7 +106,7 @@ function App() {
   useEffect(() => {
       query();
   }, [])
-  
+    
 
   return (
     <div>
