@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+/*
+ * @Date: 2025-01-21 17:21:16
+ * @Description: description
+ */
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AaaService } from './aaa.service';
 import { CreateAaaDto } from './dto/create-aaa.dto';
 import { UpdateAaaDto } from './dto/update-aaa.dto';
@@ -9,6 +21,7 @@ export class AaaController {
 
   @Post()
   create(@Body() createAaaDto: CreateAaaDto) {
+    console.log(createAaaDto);
     return this.aaaService.create(createAaaDto);
   }
 
@@ -24,6 +37,7 @@ export class AaaController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAaaDto: UpdateAaaDto) {
+    console.log(updateAaaDto);
     return this.aaaService.update(+id, updateAaaDto);
   }
 
