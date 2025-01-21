@@ -364,3 +364,18 @@ list：存列表数据
 geo：存地理位置，支持地理位置之间的距离计算、按照半径搜索附近的位置
 
 这些都是基于 redis 实现的，因为 redis 有 geo 的数据结构，可以方便的计算两点的距离，计算某个半径内的点。
+
+## 83 Swagger自动生成api文档
+文档项目暂时不弄
+
+## 86 序列化 Entity，你不需要 VO 对象
+后端系统中常见 entity、vo、dto 三种对象，vo 是用来封装**返回的响应数据**的。
+
+entity 里加上 @Exclude 可以排除某些字段、@Expose 可以增加一些派生字段、@Transform 可以对已有字段的序列化结果做修改。
+
+然后在 cotnroller 上加上 ClassSerializerInterceptor 的 interceptor，还可以用 @SerializeOptions 来添加 options。
+
+Nest 文档里并没有提到 vo 对象，因为完全没有必要，可以直接用序列化的 entity。
+
+## 87 88 暂时没看
+
