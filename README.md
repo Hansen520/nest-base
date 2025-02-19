@@ -379,3 +379,9 @@ Nest 文档里并没有提到 vo 对象，因为完全没有必要，可以直�
 
 ## 87 88 暂时没看
 
+# 90 基于邮箱验证码登录
+综合用到了 mysql、redis、typeorm、nodemailer 等技术。
+
+并且使用 @nestjs/config 包的 ConfigModule 来封装配置。
+
+要注意的是，如果用了 .env 文件，需要保证它在 src 下，并且要在 nest-cli.json 里配置 assets 和 watchAssets，不然 build 的时候不会复制到 dist 下。
