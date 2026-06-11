@@ -15,6 +15,7 @@ export class AppController {
     return this.appService.getHello();
   }
 
+  // 去生成短链服务
   @Get('short-url')
   async generateShortUrl(@Query('url') longUrl) {
     return this.shortLongMapService.generate(longUrl)
