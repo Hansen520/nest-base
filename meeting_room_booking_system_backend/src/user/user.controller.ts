@@ -1,13 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query, UnauthorizedException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dto/udpate-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { EmailService } from 'src/email/email.service';
 import { RedisService } from 'src/redis/redis.service';
 import { LoginUserDto } from '././dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { RequireLogin, UserInfo } from 'src/custom.decorator';
+import { UserDetailVo } from './vo/user-info.vo';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 @Controller('user')
 export class UserController {
 
@@ -97,7 +100,7 @@ export class UserController {
     }, {
       expiresIn: this.configService.get('jwt_refresh_token_expres_time') || '7d'
     })
-    
+
     return vo;
   }
 
@@ -167,6 +170,44 @@ export class UserController {
   }
 
 
+  @Get('info')
+  @RequireLogin()
+  async info(@UserInfo('userId') userId: number) {
+
+    const user = await this.userService.findUserDetailById(userId);
+
+    const vo = new UserDetailVo();
+
+    vo.id = user!.id;
+    vo.email = user!.email;
+    vo.username = user!.username;
+    vo.headPic = user!.headPic;
+    vo.phoneNumber = user!.phoneNumber;
+    vo.nickName = user!.nickName;
+    vo.createTime = user!.createTime;
+    vo.isFrozen = user!.isFrozen;
+
+    return vo;
+
+  }
+
+  // 更改密码
+  @Post(['update_password', 'admin/update_password'])
+  @RequireLogin()
+  // UserInfo 里面有值，就拿到对应的值， Body拿到对应的参数
+  async updatePassword(@UserInfo('userId') userId: number, @Body() passwordDto: UpdateUserPasswordDto) {
+    // console.log(passwordDto);
+    return await this.userService.updatePassword(userId, passwordDto);
+  }
+
+
+  // 更新数据用户数据
+  @Post(['update', 'admin/update'])
+  @RequireLogin()
+  async update(@UserInfo('userId') userId: number, @Body() updateUserDto: UpdateUserDto) {
+    return await this.userService.update(userId, updateUserDto);
+  }
+
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -182,11 +223,6 @@ export class UserController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
   }
 
   @Delete(':id')

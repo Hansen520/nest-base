@@ -11,12 +11,13 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { User } from './entities/user.entity';
 
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dto/udpate-user.dto';
 import { RedisService } from 'src/redis/redis.service';
 import { Role } from './entities/role.entity';
 import { Permission } from './entities/permission.entity';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoginUserVo } from './vo/login-user.vo';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 
 /**
  * 用户服务
@@ -90,29 +91,104 @@ export class UserService {
 
 
   async findUserById(userId: number, isAdmin: boolean) {
-    const user =  await this.userRepository.findOne({
-        where: {
-            id: userId,
-            isAdmin
-        },
-        relations: [ 'roles', 'roles.permissions']
+    // 这一块可以通过数据库找到对应的数据
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+        isAdmin
+      },
+      relations: ['roles', 'roles.permissions']
     });
 
     return {
-        id: user?.id,
-        username: user?.username,
-        isAdmin: user?.isAdmin,
-        roles: user?.roles.map(item => item.name),
-        permissions: user?.roles.reduce((arr: any, item) => {
-            item.permissions.forEach(permission => {
-                if(arr.indexOf(permission) === -1) {
-                    arr.push(permission);
-                }
-            })
-            return arr;
-        }, [])
+      id: user?.id,
+      username: user?.username,
+      isAdmin: user?.isAdmin,
+      roles: user?.roles.map(item => item.name),
+      permissions: user?.roles.reduce((arr: any, item) => {
+        item.permissions.forEach(permission => {
+          if (arr.indexOf(permission) === -1) {
+            arr.push(permission);
+          }
+        })
+        return arr;
+      }, [])
     }
-}
+  }
+
+  // 更改id获取详情
+  async findUserDetailById(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId
+      }
+    });
+    return user;
+  }
+
+  async updatePassword(userId: number, passwordDto: UpdateUserPasswordDto) {
+    const captcha = await this.redisService.get(`update_password_captcha_${passwordDto.email}`);
+    console.log(captcha, 131);
+    if (!captcha) {
+      throw new HttpException('验证码已失效', HttpStatus.BAD_REQUEST);
+    }
+
+    if (passwordDto.captcha !== captcha) {
+      throw new HttpException('验证码不正确', HttpStatus.BAD_REQUEST);
+    }
+
+    const foundUser = await this.userRepository.findOneBy({
+      id: userId
+    });
+
+    foundUser!.password = md5(passwordDto.password);
+
+    try {
+      await this.userRepository.save(foundUser as any);
+      return '密码修改成功';
+    } catch (e) {
+      this.logger.error(e, UserService);
+      return '密码修改失败';
+    }
+  }
+
+
+  // 更新用户数据
+  async update(userId: number, updateUserDto: UpdateUserDto) {
+    const captcha = await this.redisService.get(`update_user_captcha_${updateUserDto.email}`);
+
+    console.log(captcha, updateUserDto.email, 160);
+
+    if (!captcha) {
+      throw new HttpException('验证码已失效', HttpStatus.BAD_REQUEST);
+    }
+
+    if (updateUserDto.captcha !== captcha) {
+      throw new HttpException('验证码不正确', HttpStatus.BAD_REQUEST);
+    }
+
+    const foundUser = await this.userRepository.findOneBy({
+      id: userId
+    });
+
+    if (updateUserDto.nickName) {
+      foundUser!.nickName = updateUserDto.nickName;
+    }
+    if (updateUserDto.headPic) {
+      foundUser!.headPic = updateUserDto.headPic;
+    }
+
+    try {
+      await this.userRepository.save(foundUser as any);
+      return '用户信息修改成功';
+    } catch (e) {
+      this.logger.error(e, UserService);
+      return '用户信息修改成功';
+    }
+  }
+
+
+
 
   /**
    * 初始化测试数据
@@ -191,7 +267,7 @@ export class UserService {
       throw new HttpException('密码错误', HttpStatus.BAD_REQUEST);
     }
 
-    
+
 
     const vo = new LoginUserVo();
     vo.userInfo = {
@@ -229,10 +305,6 @@ export class UserService {
 
   findOne(id: number) {
     return `This action returns a #${id} email`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} email`;
   }
 
   remove(id: number) {
