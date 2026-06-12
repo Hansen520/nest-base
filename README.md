@@ -502,3 +502,6 @@ https://p9-juejin-sign.byteimg.com/tos-cn-i-k3u1fbpfcp/61a0fb0eb466488a9a8a8ba9d
 
 然后用 pptxgenjs 来生成了 ppt。
 
+# 109 整个项目的搭建与构建
+
+dto 是接收参数的，vo 是封装返回的数据的，entity 是和数据库表对应的。
