@@ -10,16 +10,33 @@ import { RedisModule } from './redis/redis.module';
 import { EmailModule } from './email/email.module';
 import { ConfigModule } from '@nestjs/config';
 import { ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { LoginGuard } from './login.guard';
+import { PermissionGuard } from './permission.guard';
 
 
 @Module({
   imports: [
+    JwtModule.registerAsync({
+      global: true,
+      useFactory(configService: ConfigService) {
+        return {
+          secret: configService.get('jwt_secret'),
+          signOptions: {
+            expiresIn: '30m' // 默认 30 分钟
+          }
+        }
+      },
+      inject: [ConfigService]
+    }),
     UserModule,
     // 这个文件是配置环境变量的文件
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: 'src/.env' // 为什么 .env 不放在根目录呢？ 因为根目录下的配置文件不会自动复制到 dist 目录。 asssets 是指定 build 时复制的文件，watchAssets 是在 assets 变动之后自动重新复制。
     }),
+
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory(configService: ConfigService) {
@@ -45,6 +62,15 @@ import { ConfigService } from '@nestjs/config';
     EmailModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService, {
+      provide: APP_GUARD,
+      useClass: LoginGuard // 提供权限核心
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard
+    }
+  ],
 })
 export class AppModule { }

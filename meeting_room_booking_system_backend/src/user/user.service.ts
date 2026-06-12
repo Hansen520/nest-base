@@ -88,6 +88,32 @@ export class UserService {
 
   }
 
+
+  async findUserById(userId: number, isAdmin: boolean) {
+    const user =  await this.userRepository.findOne({
+        where: {
+            id: userId,
+            isAdmin
+        },
+        relations: [ 'roles', 'roles.permissions']
+    });
+
+    return {
+        id: user?.id,
+        username: user?.username,
+        isAdmin: user?.isAdmin,
+        roles: user?.roles.map(item => item.name),
+        permissions: user?.roles.reduce((arr: any, item) => {
+            item.permissions.forEach(permission => {
+                if(arr.indexOf(permission) === -1) {
+                    arr.push(permission);
+                }
+            })
+            return arr;
+        }, [])
+    }
+}
+
   /**
    * 初始化测试数据
    *
@@ -161,11 +187,11 @@ export class UserService {
       throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);
     }
 
-    if (user.password !== md5(loginUserDto.password)) {
+    if (user?.password !== md5(loginUserDto.password)) {
       throw new HttpException('密码错误', HttpStatus.BAD_REQUEST);
     }
 
-    console.log(user, 168);
+    
 
     const vo = new LoginUserVo();
     vo.userInfo = {

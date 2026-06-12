@@ -505,3 +505,19 @@ https://p9-juejin-sign.byteimg.com/tos-cn-i-k3u1fbpfcp/61a0fb0eb466488a9a8a8ba9d
 # 109 整个项目的搭建与构建
 
 dto 是接收参数的，vo 是封装返回的数据的，entity 是和数据库表对应的。
+
+配置抽离使用 @nestjs/config 包，把配置放在 src 下的 .env 文件里，然后代码里从 configService 读取配置。
+
+这样可以配置 nest-cli.json 的 assets 和 watchAssets 来自动把 env 文件复制到 dist 目录下。
+
+我们使用代码做的数据初始化，线上要删掉这个接口，用导出的 sql 文件来初始化。
+
+登录成功之后，返回 access_token、refresh_token 还有用户信息、roles、permissions 等。
+
+并支持使用 refreshToken 来刷新 token。
+
+之后使用 LoginGuard、PermissionGuard 来做登录和权限的鉴权，根据 handler 上的 metadata 来确定要不要做鉴权、需要什么权限。
+
+我们还封装了几个自定义装饰器，用于方便的设置 metadata，从 request 取数据注入 handler。
+
+至此，注册、登录、鉴权、配置抽离等功能就完成了。
