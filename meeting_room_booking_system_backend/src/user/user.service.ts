@@ -6,7 +6,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { md5 } from 'src/utils';
-import { Repository } from 'typeorm';
+import { Like, Repository, Tree } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { User } from './entities/user.entity';
 
@@ -188,6 +188,55 @@ export class UserService {
   }
 
 
+  // 通过id冻结用户
+  async freezeUserById(id: number) {
+    const user = await this.userRepository.findOneBy({
+      id
+    });
+
+    if (!user) {
+      return '未找到用户';
+    }
+
+    user.isFrozen = true;
+
+    await this.userRepository.save(user);
+  }
+
+
+  // 获取用户列表
+  async findUsers(username: string, nickName: string, email: string, pageNo: number, pageSize: number) {
+    const skipCount = (pageNo - 1) * pageSize;
+
+    const condition: Record<string, any> = {};
+
+    if (username) {
+      // 模糊查找
+      condition.username = Like(`%${username}%`);
+    }
+
+    if (nickName) {
+      condition.nickName = Like(`%${nickName}%`);
+    }
+    if (email) {
+      condition.email = Like(`%${email}%`);
+    }
+
+
+    // 一条是分页查询，指定了 limit 2 offset 2，这个和 limit 2, 2 是一样的
+    const [users, totalCount] = await this.userRepository.findAndCount({
+      // 这边展示返回的就是select选择完成后的这些字段
+      select: ['id', 'username', 'nickName', 'email', 'phoneNumber', 'isFrozen', 'headPic', 'createTime'],
+      skip: skipCount, // 页面的大小
+      take: pageSize, // 返回的条数
+      where: condition // 模糊查找where
+    });
+
+    return {
+      users,
+      totalCount // 总条数
+    }
+  }
 
 
   /**

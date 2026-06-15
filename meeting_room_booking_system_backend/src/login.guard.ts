@@ -5,6 +5,7 @@ import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { Permission } from './user/entities/permission.entity';
 import { request } from 'http';
+import { UnLoginException } from './unlogin.filter';
 
 
 interface JwtUserData {
@@ -35,6 +36,7 @@ export class LoginGuard implements CanActivate {
 
     const request: Request = context.switchToHttp().getRequest();
 
+    // 设置装饰器的名字
     const requireLogin = this.reflector.getAllAndOverride('require-login', [
       context.getClass(),
       context.getHandler()
@@ -64,8 +66,9 @@ export class LoginGuard implements CanActivate {
       return true;
 
     } catch (e) {
-      throw new UnauthorizedException('token 失效，请重新登录');
+      // throw new UnauthorizedException('token 失效，请重新登录');
+      throw new UnLoginException()
     }
-    
+
   }
 }
