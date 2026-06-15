@@ -160,6 +160,7 @@ export class UserService {
     console.log(captcha, updateUserDto.email, 160);
 
     if (!captcha) {
+      
       throw new HttpException('验证码已失效', HttpStatus.BAD_REQUEST);
     }
 

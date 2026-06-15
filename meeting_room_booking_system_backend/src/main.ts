@@ -18,7 +18,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new InvokeRecordInterceptor());
   // 用户没有登录
   app.useGlobalFilters(new UnloginFilter());
-  // 调用通用化异常处理
+  // 调用通用化异常处理, 如dto字段校验
   app.useGlobalFilters(new CustomExceptionFilter());
 
   const configService = app.get(ConfigService);

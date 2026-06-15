@@ -10,6 +10,7 @@ export class CustomExceptionFilter<T> implements ExceptionFilter {
 
     const res = exception.getResponse() as { message: string[] };
 
+    // 异常数据的返回处理，比如说我dto里面在调用的数据没有传，则会返回data里面的异常数据
     response.json({
       code: exception.getStatus(),
       message: 'fail',
