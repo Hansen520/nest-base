@@ -18,6 +18,7 @@ import { Permission } from './entities/permission.entity';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoginUserVo } from './vo/login-user.vo';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { UserListVo } from './vo/user-list.vo';
 
 /**
  * 用户服务
@@ -233,10 +234,13 @@ export class UserService {
       where: condition // 模糊查找where
     });
 
-    return {
-      users,
-      totalCount // 总条数
-    }
+    const vo = new UserListVo();
+
+    vo.users = users;
+    vo.totalCount = totalCount;
+
+    return vo;
+    
   }
 
 
