@@ -533,3 +533,17 @@ dto 是接收参数的，vo 是封装返回的数据的，entity 是和数据库
 然后提交数据进行更新，用到的 userId 通过之前封装的 @UserInfo 装饰器从 request.user 来取。
 
 还剩个列表接口，我们下节再写。
+
+114 这节我们实现了冻结用户和用户列表接口。
+
+我们通过自定义 exception filter，catch 了 HTTPException，返回了自定义格式的响应，统一了响应格式。
+
+冻结用户接口比较简单，就是修改 users 表的一个字段。
+
+用户列表支持了分页查询和模糊搜索：
+
+分页查询就是根据 (pageNo -1) * pageSize 计算出从哪里开始，然后取 pageSize 条。
+
+模糊搜索就是通过 like 来匹配。
+
+此外，ParseIntPipe 我们自定义了错误格式，还使用了 DefaultValuePipe 设置了默认值。
