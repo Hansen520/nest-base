@@ -57,7 +57,7 @@ export class UserController {
     await this.emailService.sendMail({
       to: address,
       subject: '注册验证码',
-      html: `<p>你的注册验证码是${code}</p>, ${date.getFullYear()}, ${date.getMonth() + 1}, ${date.getDate()} ,星期${date.getDay()}`
+      html: `<p>你的注册验证码是${code}</p> ----- ${date.getFullYear()}, ${date.getMonth() + 1}, ${date.getDate()}, 星期${date.getDay()}`
     })
     return '发送成功';
   }
@@ -247,7 +247,6 @@ export class UserController {
   }
 
   // 更改密码
-  @ApiBearerAuth()
   @ApiBody({
     type: UpdateUserPasswordDto
   })
@@ -256,14 +255,13 @@ export class UserController {
     description: '验证码已失效/不正确'
   })
   @Post(['update_password', 'admin/update_password'])
-  @RequireLogin()
   // UserInfo 里面有值，就拿到对应的值， Body拿到对应的参数
-  async updatePassword(@UserInfo('userId') userId: number, @Body() passwordDto: UpdateUserPasswordDto) {
+  async updatePassword(@Body() passwordDto: UpdateUserPasswordDto) {
     // console.log(passwordDto);
-    return await this.userService.updatePassword(userId, passwordDto);
+    return await this.userService.updatePassword(passwordDto);
   }
 
-  @ApiBearerAuth()
+
   @ApiQuery({
     name: 'address',
     description: '邮箱地址',
@@ -273,7 +271,6 @@ export class UserController {
     type: String,
     description: '发送成功'
   })
-  @RequireLogin()
   @Get('update_password/captcha')
   async updatePasswordCaptcha(@Query('address') address: string) {
     const code = Math.random().toString().slice(2, 8);
@@ -285,6 +282,7 @@ export class UserController {
       subject: '更新密码验证码',
       html: `<p>你的更改密码验证码 ${code} </p>`
     })
+    return '发送成功';
   }
 
 

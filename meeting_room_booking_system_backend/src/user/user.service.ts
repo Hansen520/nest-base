@@ -127,7 +127,7 @@ export class UserService {
     return user;
   }
 
-  async updatePassword(userId: number, passwordDto: UpdateUserPasswordDto) {
+  async updatePassword(passwordDto: UpdateUserPasswordDto) {
     const captcha = await this.redisService.get(`update_password_captcha_${passwordDto.email}`);
     console.log(captcha, 131);
     if (!captcha) {
@@ -139,8 +139,13 @@ export class UserService {
     }
 
     const foundUser = await this.userRepository.findOneBy({
-      id: userId
+      username: passwordDto.username
     });
+
+    if (foundUser?.email !== passwordDto.email) {
+      console.log(foundUser?.email, passwordDto.email, 146);
+      throw new HttpException('邮箱不正确1', HttpStatus.BAD_REQUEST);
+    }
 
     foundUser!.password = md5(passwordDto.password);
 
@@ -161,7 +166,6 @@ export class UserService {
     console.log(captcha, updateUserDto.email, 160);
 
     if (!captcha) {
-      
       throw new HttpException('验证码已失效', HttpStatus.BAD_REQUEST);
     }
 
@@ -240,7 +244,7 @@ export class UserService {
     vo.totalCount = totalCount;
 
     return vo;
-    
+
   }
 
 
