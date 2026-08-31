@@ -7,9 +7,10 @@ import { InvokeRecordInterceptor } from './invoke-record.interceptor';
 import { UnloginFilter } from './unlogin.filter';
 import { CustomExceptionFilter } from './custom-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // 全局启用字段校验通道
   app.useGlobalPipes(new ValidationPipe());
@@ -21,6 +22,12 @@ async function bootstrap() {
   app.useGlobalFilters(new UnloginFilter());
   // 调用通用化异常处理, 如dto字段校验
   app.useGlobalFilters(new CustomExceptionFilter());
+
+
+  // 将uploads目录为静态目录
+  app.useStaticAssets('uploads', {
+    prefix: '/uploads'
+  });
 
   const config = new DocumentBuilder()
     .setTitle('会议室预定系统')

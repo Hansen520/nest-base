@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query, UnauthorizedException, ParseIntPipe, BadRequestException, DefaultValuePipe, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query, UnauthorizedException, ParseIntPipe, BadRequestException, DefaultValuePipe, HttpStatus, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/udpate-user.dto';
@@ -14,6 +14,10 @@ import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { generateParseIntPipe } from 'src/utils';
 import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RefreshTokenVo } from './vo/refresh-token.vo';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Request, Response } from 'express';
+import path from 'path';
+import { storage } from 'src/my-file-storage';
 
 
 @ApiTags('用户管理模块')
@@ -21,7 +25,7 @@ import { RefreshTokenVo } from './vo/refresh-token.vo';
 export class UserController {
 
   constructor(private readonly userService: UserService) { }
-
+  
   @Inject(EmailService)
   private emailService: EmailService;
 
@@ -53,6 +57,7 @@ export class UserController {
     const date = new Date();
 
     await this.redisService.set(`captcha_${address}`, code, 5000 * 60);
+
 
     await this.emailService.sendMail({
       to: address,
@@ -367,6 +372,27 @@ export class UserController {
   ) {
 
     return await this.userService.findUsers(username, nickName, email, pageNo, pageSize);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file', {
+    dest: 'uploads',
+    storage: storage,
+    limits: {
+      fileSize: 1024 * 1024 * 3
+    },
+    fileFilter(req, file, callback) {
+      const extname = path.extname(file.originalname);
+      if (['.png', '.jpg', '.gif', '.svg'].includes(extname)) {
+        callback(null, true);
+      } else {
+        callback(new BadRequestException('只能上传图片'), false);
+      }
+    }
+  }))
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log('file', file);
+    return file.path;
   }
 
 
