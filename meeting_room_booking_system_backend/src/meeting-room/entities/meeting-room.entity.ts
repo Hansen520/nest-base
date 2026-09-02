@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
+// 这边通常是数据库的实体
 @Entity()
 export class MeetingRoom {
     
