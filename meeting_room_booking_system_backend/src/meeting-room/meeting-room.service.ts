@@ -4,6 +4,7 @@ import { UpdateMeetingRoomDto } from './dto/update-meeting-room.dto';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { MeetingRoom } from './entities/meeting-room.entity';
 import { EntityManager, Like, Repository } from 'typeorm';
+import { Booking } from 'src/booking/entities/booking.entity';
 
 @Injectable()
 export class MeetingRoomService {
@@ -118,19 +119,19 @@ export class MeetingRoomService {
 
   // 删除
   async delete(id: number) {
-    // const bookings = await this.entityManager.findBy(Booking, {
-    //   room: {
-    //     id: id
-    //   }
-    // })
+    const bookings = await this.entityManager.findBy(Booking, {
+      room: {
+        id: id
+      }
+    })
 
-    // for (let i = 0; i < bookings.length; i++) {
-    //   this.entityManager.delete(Booking, bookings[i].id);
-    // }
+    for (let i = 0; i < bookings.length; i++) {
+      this.entityManager.delete(Booking, bookings[i].id);
+    }
 
-    // await this.repository.delete(id);
+    await this.repository.delete(id);
 
-    // return 'success';
+    return 'success';
   }
 
 
