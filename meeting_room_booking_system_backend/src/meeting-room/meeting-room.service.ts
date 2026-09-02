@@ -46,6 +46,35 @@ export class MeetingRoomService {
     return await this.repository.insert(meetingRoomDto);
   }
 
+  async update(meetingRoomDto: UpdateMeetingRoomDto) {
+    const meetingRoom = await this.repository.findOneBy({
+      id: meetingRoomDto.id
+    })
+
+    if(!meetingRoom) {
+      throw new BadRequestException('会议室不存在');
+    }
+
+    meetingRoom.capacity = meetingRoomDto.capacity;
+    meetingRoom.location = meetingRoomDto.location;
+    meetingRoom.name = meetingRoomDto.name;
+
+    if(meetingRoomDto.description) {
+      meetingRoom.description = meetingRoomDto.description;
+    }
+
+    if(meetingRoomDto.equipment) {
+      meetingRoom.equipment = meetingRoomDto.equipment;
+    }
+
+    await this.repository.update({
+      id: meetingRoom.id
+    } , meetingRoom);
+
+    return 'success';
+
+  }
+
   async find(pageNo, pageSize) {
     if (pageNo < 1) {
       throw new BadRequestException('页码最小为 1');
@@ -75,9 +104,6 @@ export class MeetingRoomService {
     return `This action returns a #${id} meetingRoom`;
   }
 
-  update(id: number, updateMeetingRoomDto: UpdateMeetingRoomDto) {
-    return `This action updates a #${id} meetingRoom`;
-  }
 
   remove(id: number) {
     return `This action removes a #${id} meetingRoom`;

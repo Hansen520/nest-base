@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, DefaultValuePipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, DefaultValuePipe, Put } from '@nestjs/common';
 import { MeetingRoomService } from './meeting-room.service';
 import { CreateMeetingRoomDto } from './dto/create-meeting-room.dto';
 import { UpdateMeetingRoomDto } from './dto/update-meeting-room.dto';
@@ -13,6 +13,10 @@ export class MeetingRoomController {
     return await this.meetingRoomService.create(meetingRoomDto);
   }
 
+  @Put('update')
+  async update(@Body() meetingRoomDto: UpdateMeetingRoomDto) {
+      return await this.meetingRoomService.update(meetingRoomDto);
+  }
 
   @Get('list')
   async list(
@@ -35,10 +39,6 @@ export class MeetingRoomController {
     return this.meetingRoomService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMeetingRoomDto: UpdateMeetingRoomDto) {
-    return this.meetingRoomService.update(+id, updateMeetingRoomDto);
-  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
