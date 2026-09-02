@@ -3,6 +3,7 @@ import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { generateParseIntPipe } from 'src/utils';
+import { RequireLogin, UserInfo } from 'src/custom.decorator';
 
 @Controller('booking')
 export class BookingController {
@@ -20,6 +21,36 @@ export class BookingController {
   ) {
     return this.bookingService.find(pageNo, pageSize, username, meetingRoomName, meetingRoomPosition, bookingTimeRangeStart, bookingTimeRangeEnd);
   }
+
+  @Post('add')
+  @RequireLogin()
+  async add(@Body() booking: CreateBookingDto, @UserInfo('userId') userId: number) {
+    await this.bookingService.add(booking, userId);
+    return 'success';
+  }
+
+  // 申请通过
+  @Get("apply/:id")
+  async apply(@Param('id') id: number) {
+    return this.bookingService.apply(id);
+  }
+
+  @Get("reject/:id")
+  async reject(@Param('id') id: number) {
+    return this.bookingService.reject(id);
+  }
+
+  @Get("unbind/:id")
+  async unbind(@Param('id') id: number) {
+    return this.bookingService.unbind(id);
+  }
+
+  // 催办
+  @Get('urge/:id')
+async urge(@Param('id') id: number) {
+    return this.bookingService.urge(id);
+}
+
 
 
   @Post()

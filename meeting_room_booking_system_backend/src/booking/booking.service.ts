@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { Between, EntityManager, Like } from 'typeorm';
+import { Between, EntityManager, LessThanOrEqual, Like, MoreThanOrEqual } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { MeetingRoom } from 'src/meeting-room/entities/meeting-room.entity';
 import { Booking } from './entities/booking.entity';
+import { RedisService } from 'src/redis/redis.service';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class BookingService {
@@ -13,6 +15,12 @@ export class BookingService {
 
   @InjectEntityManager()
   private entityManager: EntityManager;
+
+  @Inject(RedisService)
+  private redisService: RedisService;
+
+  @Inject(EmailService)
+  private emailService: EmailService;
 
   async initData() {
     const user1 = await this.entityManager.findOneBy(User, {
@@ -136,6 +144,114 @@ export class BookingService {
     }
 
   }
+
+  async add(bookingDto: CreateBookingDto, userId: number) {
+    const meetingRoom = await this.entityManager.findOneBy(MeetingRoom, {
+      id: bookingDto.meetingRoomId
+    });
+
+    if (!meetingRoom) {
+      throw new BadRequestException('会议室不存在');
+    }
+
+    const user = await this.entityManager.findOneBy(User, {
+      id: userId
+    });
+
+    if (!user) {
+      throw new BadRequestException('用户不存在');
+    }
+
+    const booking = new Booking();
+    booking.room = meetingRoom;
+    booking.user = user;
+    booking.startTime = new Date(bookingDto.startTime);
+    booking.endTime = new Date(bookingDto.endTime);
+
+    // 检查时间段是否冲突
+    // 冲突条件：已存在的预订的 startTime < 新预订的 endTime 且已存在的预订的 endTime > 新预订的 startTime
+    const res = await this.entityManager.findOneBy(Booking, {
+      room: {
+        id: bookingDto.meetingRoomId
+      },
+      startTime: LessThanOrEqual(booking.endTime),
+      endTime: MoreThanOrEqual(booking.startTime)
+    });
+
+    if (res) {
+      throw new BadRequestException('该时间段已被预定');
+    }
+
+
+
+    await this.entityManager.save(Booking, booking);
+  }
+
+  async apply(id: number) {
+    await this.entityManager.update(Booking, {
+      id
+    }, {
+      status: '审批通过'
+    });
+    return 'success'
+  }
+
+  async reject(id: number) {
+    await this.entityManager.update(Booking, {
+      id
+    }, {
+      status: '审批驳回'
+    });
+    return 'success'
+  }
+
+  async unbind(id: number) {
+    await this.entityManager.update(Booking, {
+      id
+    }, {
+      status: '已解除'
+    });
+    return 'success'
+  }
+
+
+  async urge(id: number) {
+    const flag = await this.redisService.get('urge_' + id);
+
+    if(flag) {
+      return '半小时内只能催办一次，请耐心等待';
+    }
+
+    let email = await this.redisService.get('admin_email');
+
+    if(!email) { 
+      const admin = await this.entityManager.findOne(User, {
+        select: {
+          email: true
+        },
+        where: {
+          isAdmin: true
+        }
+      });
+
+      if (!admin) {
+        throw new BadRequestException('管理员不存在');
+      }
+
+      email = admin.email
+
+      this.redisService.set('admin_email', admin.email);
+    }
+
+    this.emailService.sendMail({
+      to: email,
+      subject: '预定申请催办提醒',
+      html: `id 为 ${id} 的预定申请正在等待审批`
+    });
+    
+    this.redisService.set('urge_' + id, 1, 60 * 30);
+}
+
 
 
   create(createBookingDto: CreateBookingDto) {
