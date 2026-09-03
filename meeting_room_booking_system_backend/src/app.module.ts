@@ -41,8 +41,11 @@ import * as path from 'path'
     // 这个文件是配置环境变量的文件
     ConfigModule.forRoot({
       isGlobal: true,
-      // envFilePath: 'src/.env' // 为什么 .env 不放在根目录呢？ 因为根目录下的配置文件不会自动复制到 dist 目录。 asssets 是指定 build 时复制的文件，watchAssets 是在 assets 变动之后自动重新复制。
-      envFilePath: path.join(__dirname, '.env')
+      // Local runs use .dev.env (localhost); production containers use .env.
+      // Keep .env as a fallback so shared settings such as JWT remain available.
+      envFilePath: process.env.NODE_ENV === 'production'
+        ? path.join(__dirname, '.env')
+        : [path.join(__dirname, '.dev.env'), path.join(__dirname, '.env')]
     }),
 
     TypeOrmModule.forRootAsync({

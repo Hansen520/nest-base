@@ -22,6 +22,8 @@ COPY --from=builder /app/package.json /app/package.json
 
 WORKDIR /app
 
+ENV NODE_ENV=production
+
 RUN npm config set registry https://registry.npmmirror.com/
 
 RUN npm install --production
