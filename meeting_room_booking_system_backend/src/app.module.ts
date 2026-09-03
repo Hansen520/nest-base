@@ -55,7 +55,8 @@ import * as path from 'path'
           username: configService.get('mysql_server_username'),
           password: configService.get('mysql_server_password'),
           database: configService.get('mysql_server_database'),
-          synchronize: true,
+          // synchronize: true, // 用了这个后，数据库会跟着entity的更新实时更新，生产上线后不需要了
+          synchronize: false,
           logging: true,
           entities: [User, Role, Permission, MeetingRoom, Booking],
           poolSize: 10,

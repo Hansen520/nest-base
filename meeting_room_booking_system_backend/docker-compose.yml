@@ -12,7 +12,12 @@ services:
       - "3005:3000"
     environment:
       redis_server_host: redis-container
+      redis_server_port: 6379
       mysql_server_host: mysql-container
+      mysql_server_port: 3306
+      mysql_server_username: root
+      mysql_server_password: admin
+      mysql_server_database: meeting_room_booking_system
     networks:
       - common-network
   mysql-container:
@@ -24,6 +29,8 @@ services:
     environment:
       MYSQL_DATABASE: meeting_room_booking_system
       MYSQL_ROOT_PASSWORD: admin
+      # Required when the application connects over the Docker network.
+      MYSQL_ROOT_HOST: "%"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-padmin"]
       interval: 5s
@@ -33,8 +40,6 @@ services:
       - common-network
   redis-container:
     image: docker.m.daocloud.io/library/redis:8-alpine
-    ports:
-      - "6379:6379"
     volumes:
       - D:\redis-data:/data
     healthcheck:
