@@ -18,6 +18,9 @@ import { MeetingRoomModule } from './meeting-room/meeting-room.module';
 import { MeetingRoom } from './meeting-room/entities/meeting-room.entity';
 import { BookingModule } from './booking/booking.module';
 import { Booking } from './booking/entities/booking.entity';
+import { StatisticModule } from './statistic/statistic.module';
+
+import * as path from 'path'
 
 
 @Module({
@@ -38,7 +41,8 @@ import { Booking } from './booking/entities/booking.entity';
     // 这个文件是配置环境变量的文件
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: 'src/.env' // 为什么 .env 不放在根目录呢？ 因为根目录下的配置文件不会自动复制到 dist 目录。 asssets 是指定 build 时复制的文件，watchAssets 是在 assets 变动之后自动重新复制。
+      // envFilePath: 'src/.env' // 为什么 .env 不放在根目录呢？ 因为根目录下的配置文件不会自动复制到 dist 目录。 asssets 是指定 build 时复制的文件，watchAssets 是在 assets 变动之后自动重新复制。
+      envFilePath: path.join(__dirname, '.env')
     }),
 
     TypeOrmModule.forRootAsync({
@@ -65,7 +69,8 @@ import { Booking } from './booking/entities/booking.entity';
     RedisModule,
     EmailModule,
     MeetingRoomModule,
-    BookingModule
+    BookingModule,
+    StatisticModule
   ],
   controllers: [AppController],
   providers: [
