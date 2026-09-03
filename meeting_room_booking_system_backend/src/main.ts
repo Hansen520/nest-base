@@ -24,7 +24,7 @@ async function bootstrap() {
   app.useGlobalFilters(new CustomExceptionFilter());
 
 
-  // 将uploads目录为静态目录
+  // 将uploads目录为静态目录, 这样子可以直接访问
   app.useStaticAssets('uploads', {
     prefix: '/uploads'
   });
