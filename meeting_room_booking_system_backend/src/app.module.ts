@@ -59,10 +59,7 @@ import * as path from 'path'
           logging: true,
           entities: [User, Role, Permission, MeetingRoom, Booking],
           poolSize: 10,
-          connectorPackage: 'mysql2',
-          extra: {
-            authPlugin: 'sha256_password',
-          }
+          connectorPackage: 'mysql2'
         }
       }
     }),
