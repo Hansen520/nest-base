@@ -1,31 +1,52 @@
-version: '3.8'
 services:
   nest-app:
     build:
       context: ./
       dockerfile: ./Dockerfile
     depends_on:
-      - mysql-container
-      - redis-container
+      mysql-container:
+        condition: service_healthy
+      redis-container:
+        condition: service_healthy
     ports:
-      - 3005:3005
+      - "3005:3000"
+    environment:
+      redis_server_host: redis-container
+      mysql_server_host: mysql-container
     networks:
       - common-network
   mysql-container:
-    image: mysql
+    image: docker.m.daocloud.io/library/mysql:8.0
+    ports:
+      - "3306:3306"
     volumes:
-      - /Users/guang/mysql-data:/var/lib/mysql
+      - D:\sql-data:/var/lib/mysql
     environment:
       MYSQL_DATABASE: meeting_room_booking_system
-      MYSQL_ROOT_PASSWORD: guang
+      MYSQL_ROOT_PASSWORD: admin
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-padmin"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     networks:
       - common-network
   redis-container:
-    image: redis
+    image: docker.m.daocloud.io/library/redis:8-alpine
+    ports:
+      - "6379:6379"
     volumes:
-      - /Users/guang/redis-data:/data
+      - D:\redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
     networks:
       - common-network
 networks:
   common-network:
     driver: bridge
+volumes:
+  mysql-data:
+  redis-data:

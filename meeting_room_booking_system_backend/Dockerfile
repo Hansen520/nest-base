@@ -1,4 +1,6 @@
-FROM node:18.0-alpine3.14 as build-stage
+ARG NODE_IMAGE=docker.m.daocloud.io/library/node:20-alpine
+
+FROM ${NODE_IMAGE} AS builder
 
 WORKDIR /app
 
@@ -13,10 +15,10 @@ COPY . .
 RUN npm run build
 
 # production stage
-FROM node:18.0-alpine3.14 as production-stage
+FROM ${NODE_IMAGE} AS production-stage
 
-COPY --from=build-stage /app/dist /app
-COPY --from=build-stage /app/package.json /app/package.json
+COPY --from=builder /app/dist /app
+COPY --from=builder /app/package.json /app/package.json
 
 WORKDIR /app
 
@@ -24,6 +26,6 @@ RUN npm config set registry https://registry.npmmirror.com/
 
 RUN npm install --production
 
-EXPOSE 3005
+EXPOSE 3000
 
 CMD ["node", "/app/main.js"]
