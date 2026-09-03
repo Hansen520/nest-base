@@ -17,8 +17,8 @@ services:
       - common-network
   mysql-container:
     image: docker.m.daocloud.io/library/mysql:8.0
-    ports:
-      - "3306:3306"
+    # ports:
+    #   - "3306:3306"
     volumes:
       - D:\sql-data:/var/lib/mysql
     environment:
