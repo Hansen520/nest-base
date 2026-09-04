@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { md5 } from 'src/utils';
 import { Like, Repository, Tree } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { User } from './entities/user.entity';
+import { LoginType, User } from './entities/user.entity';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/udpate-user.dto';
@@ -351,6 +351,19 @@ export class UserService {
 
     return vo;
   }
+
+  async registerByGoogleInfo(email: string, nickName: string, headPic: string) {
+    const newUser = new User();
+    newUser.email = email;
+    newUser.nickName = nickName;
+    newUser.headPic = headPic;
+    newUser.password = '';
+    newUser.username = email + Math.random().toString().slice(2, 10);
+    newUser.loginType = LoginType.GOOGLE;
+    newUser.isAdmin = false;
+
+    return this.userRepository.save(newUser);
+}
 
 
   create(createUserDto: CreateUserDto) {

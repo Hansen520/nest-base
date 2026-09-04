@@ -22,6 +22,7 @@ import { Request, Response } from 'express';
 import path from 'path';
 import { storage } from 'src/my-file-storage';
 import { AuthGuard } from '@nestjs/passport';
+import { LoginUserVo } from './vo/login-user.vo';
 
 
 @ApiTags('用户管理模块')
@@ -166,15 +167,48 @@ export class UserController {
 
   @Get('callback/google')
   @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(@Req() req) {
+  async googleAuthRedirect(@Req() req) {
     if (!req.user) {
-      return 'No user from google'
+      throw new BadRequestException('google 登录失败');
+    }
+    const user = await this.userService.registerByGoogleInfo(
+      req.user.email,
+      req.user.firstName + ' ' + req.user.lastName,
+      req.user.picture
+    );
+
+    const vo = new LoginUserVo();
+    vo.userInfo = {
+      id: user.id,
+      username: user.username,
+      nickName: user.nickName,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      headPic: user.headPic,
+      createTime: user.createTime.getTime(),
+      isFrozen: user.isFrozen,
+      isAdmin: user.isAdmin,
+      roles: [],
+      permissions: []
     }
 
-    return {
-      message: 'User information from google',
-      user: req.user
-    }
+    vo.accessToken = this.jwtService.sign({
+      userId: vo.userInfo.id,
+      username: vo.userInfo.username,
+      email: vo.userInfo.email,
+      roles: vo.userInfo.roles,
+      permissions: vo.userInfo.permissions
+    }, {
+      expiresIn: this.configService.get('jwt_access_token_expires_time') || '30m'
+    });
+
+    vo.refreshToken = this.jwtService.sign({
+      userId: vo.userInfo.id
+    }, {
+      expiresIn: this.configService.get('jwt_refresh_token_expres_time') || '7d'
+    });
+
+    return vo;
   }
 
 

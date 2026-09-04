@@ -7,6 +7,14 @@
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Role } from "./role.entity";
 
+
+export enum LoginType {
+    USERNAME_PASSWORD = 0,
+    GOOGLE = 1,
+    GITHUB = 2
+}
+
+
 /**
  * 用户实体
  *
@@ -151,4 +159,11 @@ export class User {
         name: 'user_roles' // 这里会新建一个一个角色的表
     })
     roles: Role[]
+
+    @Column({
+        type: 'int',
+        comment: '登录类型, 0 用户名密码登录, 1 Google 登录, 2 Github 登录',
+        default: 0
+    })
+    loginType: LoginType;
 }
