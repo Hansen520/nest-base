@@ -8,6 +8,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private readonly configService: ConfigService) {
     super({
       // 授权码换取 token 时会再次发送该地址，必须与 Google 控制台登记值完全一致。
+      // 未配置环境变量时保留本地开发凭据；生产环境应始终通过环境变量注入。
       clientID: configService.get<string>('google_client_id'),
       clientSecret: configService.get<string>('google_client_secret'),
       callbackURL: configService.get<string>('google_callback_url')
