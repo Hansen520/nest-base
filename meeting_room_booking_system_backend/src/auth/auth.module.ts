@@ -1,13 +1,10 @@
-// 模拟登录
+import { Module } from '@nestjs/common';
+import { UserModule } from 'src/user/user.module';
+import { LocalStrategy } from './local.strategy';
+import { GoogleStrategy } from './google.strategy';
 
-import { Strategy } from 'passport-local';
-import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-
-@Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
-
-  async validate(username: string, password: string) {
-    
-  }
-}
+@Module({
+    imports: [UserModule],
+    providers: [LocalStrategy, GoogleStrategy]
+})
+export class AuthModule {}

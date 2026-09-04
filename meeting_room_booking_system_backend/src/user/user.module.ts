@@ -12,5 +12,6 @@ import { Permission } from './entities/permission.entity';
   ],
   controllers: [UserController],
   providers: [UserService],
+  exports: [UserService] // 导出来供其他地方使用
 })
 export class UserModule {}
