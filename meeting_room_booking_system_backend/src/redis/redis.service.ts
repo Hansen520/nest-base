@@ -18,4 +18,10 @@ export class RedisService {
             await this.redisClient.expire(key, ttl);
         }
     }
+
+
+    // 删除redis里面其中一个key值
+    async del(key: string) {
+        await this.redisClient.del(key);
+    }
 }

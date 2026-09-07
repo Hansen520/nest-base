@@ -390,7 +390,12 @@ export class UserController {
   @RequireLogin()
   async update(@UserInfo('userId') userId: number, @Body() updateUserDto: UpdateUserDto) {
     // userId 来自已验证的登录上下文，客户端不能通过请求体修改其他用户资料。
-    return await this.userService.update(userId, updateUserDto);
+    const res = await this.userService.update(userId, updateUserDto);
+    
+    // 删除redis中的值
+    this.redisService.del(`update_user_captcha_${updateUserDto.email}`);
+
+    return res;
   }
 
   /** 冻结指定用户，使其无法继续使用系统。 */
