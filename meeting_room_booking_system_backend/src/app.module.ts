@@ -21,9 +21,11 @@ import { Booking } from './booking/entities/booking.entity';
 import { StatisticModule } from './statistic/statistic.module';
 import { MinioModule } from './minio/minio.module';
 import { AuthModule } from './auth/auth.module';
-
 import * as path from 'path'
-
+import * as winston from 'winston';
+import { utilities, WINSTON_MODULE_NEST_PROVIDER, WinstonLogger, WinstonModule } from 'nest-winston';
+import { CustomTypeOrmLogger } from './CustomTypeOrmLogger';
+import 'winston-daily-rotate-file';
 
 @Module({
   imports: [
@@ -51,8 +53,8 @@ import * as path from 'path'
     }),
 
     TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory(configService: ConfigService) {
+      inject: [ConfigService, WINSTON_MODULE_NEST_PROVIDER],
+      useFactory(configService: ConfigService, logger: any) {
         return {
           type: "mysql",
           host: configService.get('mysql_server_host'),
@@ -63,11 +65,44 @@ import * as path from 'path'
           // synchronize: true, // 用了这个后，数据库会跟着entity的更新实时更新，生产上线后不需要了
           synchronize: false,
           logging: true,
+          looger: new CustomTypeOrmLogger(logger),
           entities: [User, Role, Permission, MeetingRoom, Booking],
           poolSize: 10,
           connectorPackage: 'mysql2'
         }
       }
+    }),
+    // 各种报错信息问题处理
+    WinstonModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        level: 'debug',
+        transports: [
+          // new winston.transports.File({
+          //   filename: `${process.cwd()}/log`
+          // }),
+          // DailyRotateFile 的话要导入 winston-daily-rotate-file 这个才行
+          new winston.transports.DailyRotateFile({
+            level: configService.get('winston_log_level'),
+            dirname: configService.get('winston_log_dirname'),
+            filename: configService.get('winston_log_filename'),
+            datePattern: configService.get('winston_log_date_pattern'),
+            maxSize: configService.get('winston_log_max_size') // 文件最大的为10k， 多出10k就会进行分割
+          }),
+          new winston.transports.Console({
+            format: winston.format.combine(
+              winston.format.timestamp(),
+              utilities.format.nestLike()
+            )
+          }),
+          // 这个Http是专门用来存放日志文件的， 我们在nest里面新建了一个项目 nest new log-server 来存放日志文件
+          new winston.transports.Http({
+            host: 'localhost',
+            port: 3002,
+            path: '/log'
+          })
+        ]
+      }),
+      inject: [ConfigService]
     }),
     RedisModule,
     EmailModule,
